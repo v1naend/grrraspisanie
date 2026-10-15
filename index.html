@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Расписание: октябрь–ноябрь 2026</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#6b7280;--line:#cfd4dc;--head:#0b57d0;--l:90%;--s:65%;--tc:#1a1a1a;--br:#f1f3f6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171c;--fg:#e8eaed;--mut:#9aa0a6;--line:#3a3f48;--head:#2f6fdc;--l:24%;--s:35%;--tc:#eee;--br:#1e2128}}
+:root[data-theme="dark"]{--bg:#15171c;--fg:#e8eaed;--mut:#9aa0a6;--line:#3a3f48;--head:#2f6fdc;--l:24%;--s:35%;--tc:#eee;--br:#1e2128}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;padding:12px;background:var(--bg);color:var(--fg);font:14px system-ui,sans-serif}
+h1{font-size:18px;margin:4px 0 6px}
+.lg{font-size:12px;color:var(--mut);line-height:1.6}
+.w{margin:18px 0 6px;font-weight:700}
+.sc{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;min-width:730px;width:100%;table-layout:fixed}
+th,td{border:1px solid var(--line);padding:3px 5px;font-size:11px;vertical-align:top;height:36px;overflow-wrap:anywhere}
+th{background:var(--head);color:#fff;height:auto;padding:6px 4px}
+th.today{outline:3px solid #f5b400;outline-offset:-3px}
+.t{width:50px;position:sticky;left:0;background:var(--bg);color:var(--mut);font-size:10px;text-align:center;z-index:1}
+th.t{background:var(--head);color:#fff}
+.c{background:hsl(var(--h) var(--s) var(--l));color:var(--tc)}
+.c b{display:block;font-weight:600}.c i{font-style:normal;opacity:.75}
+.add{outline:2px solid #1a9c4a;outline-offset:-2px}
+.del{outline:2px dashed #d33;outline-offset:-2px;opacity:.6}.del b{text-decoration:line-through}
+.past{opacity:.4}
+tr.br td{height:auto;text-align:center;color:var(--mut);font-size:10px;background:var(--br);padding:2px}
+.dt{display:none;gap:4px;margin:6px 0}
+.dt button{flex:1;padding:6px 0;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:600 12px/1.3 system-ui;cursor:pointer}
+.dt button.on{background:var(--head);color:#fff;border-color:var(--head)}
+@media (max-width:699px){
+body{padding:8px}
+.dt{display:flex}
+table{min-width:0}
+.sc{overflow-x:visible}
+th,td{font-size:13px;height:46px;padding:5px 8px}
+.t{width:58px;font-size:11px}
+table[data-s="0"] [data-d]:not([data-d="0"]),table[data-s="1"] [data-d]:not([data-d="1"]),table[data-s="2"] [data-d]:not([data-d="2"]),table[data-s="3"] [data-d]:not([data-d="3"]),table[data-s="4"] [data-d]:not([data-d="4"]),table[data-s="5"] [data-d]:not([data-d="5"]){display:none}
+tr.br td{font-size:11px}
+}
+</style></head><body>
+<h1>Расписание: 12.10 – 06.12.2026</h1>
+<div class="lg">Верхняя половина ячейки – первые 45 мин, нижняя – вторые. Пустая ячейка – нет пары.<br>
+<span style="color:#1a9c4a">▣ зелёная рамка</span> – добавлено · <span style="color:#d33">▢ красный пунктир</span> – отменено · жёлтая рамка – сегодня</div>
+<div id="r"></div>
+<script>
+const F=[1,1,'Физ-ра','с/з'],M=[3,2,'Матем. в проф. деят.','302'],H=[2,2,'Ист. Бел. Государственности','310'];
+const MON=[F,[2,2,'Иностранный язык','119, 168'],[3,2,'Инженерная графика','317, 319'],[4,2,'Тех. Электроника','110']];
+const A=[MON,
+[[0,2,'Общая физика','216'],[1,2,'ТЭЦ','206'],H,M],
+[[0,2,'Иностранный язык','213, 216'],[1,0,'Охрана труда','219'],F,[2,2,'Матем. в проф. деят.','302']],
+[[1,2,'Охрана труда','201'],[2,2,'ТЭЦ','206'],[3,2,'Ист. Бел. Государственности','310']],
+[[0,2,'Сетевые технологии','104'],[1,0,'Астрономия','311'],F,[2,2,'Общая физика','311']],
+[[1,2,'Астрономия','309'],[2,2,'Инф. Технологии','321, 318'],[3,2,'Охрана окр. сред.','311']]];
+const B=[MON,
+[[0,2,'Общая физика','216'],[1,2,'ТЭЦ','206'],H,M],
+[[1,0,'Охрана труда','219'],F,[2,2,'Матем. в проф. деят.','302'],[3,2,'Тех. Электроника','110']],
+[[0,2,'Инф. Технологии','321, 318'],[1,2,'Охрана труда','201'],[2,2,'ТЭЦ','206']],
+A[4],
+[[2,2,'Инф. Технологии','321, 318'],[3,2,'Охрана окр. сред.','311']]];
+const OT=(h,r)=>[3,h,'Охрана труда',r],HI=[4,2,'Ист. Бел. Государственности',''];
+const DEL={'27.10':'Ист.','29.10':'Ист.'};
+const ADD={'21.10':[[4,2,'Охрана окр. сред.','311']],'20.11':[HI],'27.11':[HI],'11.12':[HI],'11.11':[OT(0,'211')],'19.11':[OT(2,'308')],'25.11':[OT(0,'211')],'03.12':[OT(2,'308')]};
+const T=[['08:00','08:45','08:55','09:40'],['09:55','10:40','10:50','11:35'],['12:15','13:00','13:10','13:55'],['14:10','14:55','15:05','15:50'],['16:20','17:05','17:15','18:00']];
+const DN=['Пн','Вт','Ср','Чт','Пт','Сб'],MN=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const today=new Date(2026,9,15),p2=n=>String(n).padStart(2,'0');
+const key=d=>p2(d.getDate())+'.'+p2(d.getMonth()+1);
+const sd=[3,0,0,0,0,0,0,0];
+function draw(){let out='';const mob=matchMedia('(max-width:699px)').matches,cl=i=>mob?[sd[i]]:[0,1,2,3,4,5];
+for(let i=0;i<8;i++){
+ const ds=[...Array(6)].map((_,d)=>new Date(2026,9,12+i*7+d)),end=new Date(2026,9,12+i*7+6);
+ out+=`<div class="w">Неделя ${i%2+1} · ${ds[0].getDate()} ${MN[ds[0].getMonth()]} – ${end.getDate()} ${MN[end.getMonth()]}</div><div class="dt">${[0,1,2,3,4,5].map(d=>`<button data-w="${i}" data-td="${d}" class="${sd[i]===d?'on':''}">${DN[d]}<br>${ds[d].getDate()}</button>`).join('')}</div><div class="sc"><table><tr><th class="t"></th>`;
+ const g=ds.map((dt,d)=>{
+  let L=(i%2?B:A)[d].map(x=>x.slice());
+  const dl=DEL[key(dt)];if(dl)L=L.map(x=>x[2].startsWith(dl)?x.concat('del'):x);
+  (ADD[key(dt)]||[]).forEach(x=>L.push(x.concat('add')));
+  const c=Array(10).fill(null);
+  L.forEach(l=>{const r=l[0]*2+(l[1]==2?0:l[1]);c[r]={l};if(l[1]==2)c[r+1]='x'});
+  return c});
+ cl(i).forEach(d=>{const dt=ds[d];out+=`<th data-d="${d}" class="${key(dt)==key(today)?'today':''}">${DN[(dt.getDay()+6)%7]} ${key(dt)}</th>`});
+ out+='</tr>';
+ for(let s=0;s<5;s++){
+  if(s==2)out+='<tr class="br"><td class="t"></td><td colspan="'+cl(i).length+'">обед 11:35–12:15</td></tr>';
+  if(s==4)out+='<tr class="br"><td class="t"></td><td colspan="'+cl(i).length+'">большой перерыв 15:50–16:20</td></tr>';
+  for(let h=0;h<2;h++){
+   const r=s*2+h;out+=`<tr><td class="t">${T[s][2*h]}<br>${T[s][2*h+1]}</td>`;
+   cl(i).forEach(d=>{const c=g[d];
+    const x=c[r];if(x==='x')return;
+    if(!x){out+=`<td data-d="${d}"></td>`;return}
+    const l=x.l,fl=l[4]||'',hue=[...l[2]].reduce((a,ch)=>a*31+ch.charCodeAt(0),7)%360;
+    const sub=fl=='del'?'отмена':fl=='add'?'доп.'+(l[3]?' · '+l[3]:''):l[3];
+    out+=`<td data-d="${d}" class="c ${fl} ${ds[d]<today?'past':''}" style="--h:${hue}" ${l[1]==2?'rowspan="2"':''}><b>${l[2]}</b><i>${sub}</i></td>`;
+   });
+   out+='</tr>';
+  }
+ }
+ out+='</table></div>';
+}
+document.getElementById('r').innerHTML=out;}
+draw();matchMedia('(max-width:699px)').addEventListener('change',draw);
+document.getElementById('r').addEventListener('click',e=>{const t=e.target.closest('[data-td]');if(!t)return;sd[+t.dataset.w]=+t.dataset.td;draw()});
+</script></body></html>
