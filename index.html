@@ -41,6 +41,7 @@ th.t{background:var(--head);color:#fff}
 .add{outline:2px solid #1a9c4a;outline-offset:-2px}
 .del{outline:2px dashed #d33;outline-offset:-2px;opacity:.6}.del b{text-decoration:line-through}
 tr.br td{height:auto;text-align:center;color:var(--mut);font-size:10px;background:var(--br);padding:2px}
+.sw{display:none}
 .dt{display:none;gap:4px;margin:6px 0}
 .dt button{flex:1;padding:6px 0;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:600 12px/1.3 system-ui;cursor:pointer}
 .dt button.on{background:var(--head);color:#fff;border-color:var(--head)}
@@ -57,13 +58,14 @@ table[data-s="0"] [data-d]:not([data-d="0"]),table[data-s="1"] [data-d]:not([dat
 table[data-s="6"]{display:none}
 .dc{min-height:50px;padding:2px 3px}
 .dc small{font-size:9px}
+.sw{display:inline}
 tr.br td{font-size:11px}
 }
 </style></head><body>
 <h1>Календарь занятий</h1>
 <div class="tabs"><button id="b9">Октябрь</button><button id="b10">Ноябрь</button></div>
 <div class="cal" id="cal"></div>
-<div class="lg">Нажмите на день или на «Нед.» слева — ниже откроется расписание этой недели.<br>
+<div class="lg">Нажмите на день или на «Нед.» слева — ниже откроется расписание этой недели.<span class="sw"> На телефоне: свайп влево или вправо меняет день.</span><br>
 <span class="dot" style="background:#1a9c4a"></span>доп. пара · <span class="dot" style="background:#d33"></span>отмена · <span style="color:var(--holc)">красный фон</span> – праздничный день</div>
 <div id="det"></div>
 <script>
@@ -174,4 +176,22 @@ document.getElementById('det').addEventListener('click',e=>{const t=e.target.clo
 document.getElementById('b9').onclick=()=>{mon=9;renderCal()};
 document.getElementById('b10').onclick=()=>{mon=10;renderCal()};
 renderCal();renderDet();
-matchMedia('(max-width:699px)').addEventListener('change',()=>renderDet());</script></body></html>
+matchMedia('(max-width:699px)').addEventListener('change',()=>renderDet());(()=>{
+const det=document.getElementById('det');let sx=0,sy=0;
+det.addEventListener('touchstart',e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY},{passive:true});
+det.addEventListener('touchend',e=>{
+ if(!matchMedia('(max-width:699px)').matches)return;
+ const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+ if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+ const step=dx<0?1:-1;
+ let d=selDay;
+ if(d===null)d=(today>=dateOf(sel,0)&&today<=dateOf(sel,6))?(today.getDay()+6)%7:0;
+ let n=d===6?sel*6+5+(step>0?1:0):sel*6+d+step;
+ if(n<0||n>47)return;
+ sel=Math.floor(n/6);selDay=n%6;
+ const m=dateOf(sel,selDay).getMonth();if(m===9||m===10)mon=m;
+ renderCal();renderDet();
+ try{det.animate([{transform:`translateX(${step*30}px)`,opacity:.3},{transform:'none',opacity:1}],{duration:180})}catch(_){}
+});
+})();
+</script></body></html>
