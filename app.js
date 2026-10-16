@@ -328,3 +328,7 @@ window.addEventListener('hashchange', () => {
 /* ---------- Старт: открываем сегодняшний день ---------- */
 
 go(parseHash() || todayDate(), 0);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
