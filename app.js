@@ -89,12 +89,12 @@ const HOLIDAYS = {
   '07.01': { name: 'Рождество Христово (православное)' },
 };
 
-const SESSION_FROM = new Date(2027, 0, 5);
-const SESSION_TO = new Date(2027, 0, 11);
+const SESSION_FROM = new Date(2027, 0, 4);
+const SESSION_TO = new Date(2027, 0, 10);
 
 // Первый понедельник семестра (неделя 1) и последний день календаря
 const START = new Date(2026, 9, 12);
-const END = new Date(2027, 0, 11);
+const END = new Date(2027, 0, 10);
 
 // Время пар: [начало, конец 1-й половины, начало 2-й половины, конец]
 const TIMES = [
@@ -236,7 +236,7 @@ function renderList(dir) {
 
   const hol = HOLIDAYS[k];
   if (hol) html += banner('hol', 'Праздничный день', hol.name + ', занятий нет', hol.img);
-  if (inSession(date)) html += banner('ses', 'Сессия', '5–11 января, обычных занятий нет');
+  if (inSession(date)) html += banner('ses', 'Сессия', '4–10 января, обычных занятий нет');
 
   if (!ls.length && !hol && !inSession(date)) {
     html += `<div class="empty"><b>${dow === 6 ? 'Воскресенье' : 'Занятий нет'}</b>${dow === 6 ? 'Занятий нет, можно отдохнуть' : 'В этот день пар нет'}</div>`;
@@ -266,8 +266,8 @@ function renderList(dir) {
 function render(dir) {
   const w = Math.floor(idx(date) / 7);
   const mon = addDays(START, w * 7), sun = addDays(mon, 6);
-  $('wnum').textContent = 'Неделя ' + (w % 2 + 1);
-  $('wrange').textContent = `${mon.getDate()} ${MONTHS_SHORT[mon.getMonth()]} – ${sun.getDate()} ${MONTHS_SHORT[sun.getMonth()]}`;
+  $('wnum').textContent = 'Нед. ' + (w % 2 + 1);
+  $('wrange').textContent = `${p2(mon.getDate())}.${p2(mon.getMonth() + 1)}–${p2(sun.getDate())}.${p2(sun.getMonth() + 1)}`;
   const opt = `${date.getFullYear()}-${date.getMonth()}`;
   if ([...$('month').options].some((o) => o.value === opt)) $('month').value = opt;
   $('today').hidden = same(clamp(todayDate()), date);
