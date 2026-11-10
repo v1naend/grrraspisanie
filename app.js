@@ -68,8 +68,8 @@ const HIST5 = L(4, 2, 'Ист. Бел. Государственности');
 const OT = (h, room) => L(3, h, 'Охрана труда', room);
 const ADD = {
   '21.10': [L(4, 2, 'Охрана окр. сред.', '311')],
-  '27.10': [L(2, 2, 'Матем. в проф. деят.', '310')],   // вместо отменённой истории
-  '29.10': [L(3, 2, 'Тех. Электроника', '110')],       // вместо отменённой истории
+  '27.10': [L(2, 2, 'Матем. в проф. деят.', '310')],
+  '29.10': [L(3, 2, 'Тех. Электроника', '110')],
   '11.11': [OT(0, '211')],
   '19.11': [OT(2, '308')],
   '20.11': [HIST5],
@@ -210,7 +210,7 @@ function card(l) {
   const [a, b] = span(l);
   const room = l.room === 'с/з' ? 'спортзал' : l.room ? 'ауд. ' + l.room : (l.st === 'add' ? 'аудитория не указана' : '');
   const meta = [room, l.h === 2 ? '' : '45 мин'].filter(Boolean).join(' · ');
-  const badge = { add: '<span class="badge ok">доп. пара</span>', del: '<span class="badge bad">отмена</span>', hol: '<span class="badge bad">праздник</span>' }[l.st] || '';
+  const badge = { add: '<span class="badge ok">доставлено</span>', del: '<span class="badge bad">отмена</span>', hol: '<span class="badge bad">праздник</span>' }[l.st] || '';
   const teach = TEACH[l.name];
   return `<div class="row"><div class="time"><b>${a}</b><span>${b}</span></div>` +
     `<article class="card ${l.st}" style="--h:${hue(l.name)}"><div class="ct"><h3>${l.name}</h3>${badge}</div>` +

@@ -9,14 +9,18 @@ self.addEventListener('activate', (e) => e.waitUntil(
 ));
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  const req = e.request;
+  // Только запросы к самому сайту (расширения браузера и чужие адреса пропускаем)
+  if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(req)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        }
         return res;
       })
-      .catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
+      .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
   );
 });
