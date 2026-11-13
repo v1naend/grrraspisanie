@@ -63,8 +63,13 @@ const TEACH = {
 // Отменённые пары: 'дд.мм': 'начало названия предмета'
 const DEL = { '27.10': 'Ист.', '29.10': 'Ист.' };
 
+// Последнее занятие по предмету: 'начало названия': 'дд.мм' (этот день ещё включительно).
+const LAST = {
+  'ТЭЦ': '17.12',
+};
+
 // Доставленные пары: 'дд.мм': [пары]
-const HIST5 = L(4, 2, 'Ист. Бел. Государственности');
+const HIST5 = L(4, 2, 'Ист. Бел. Государственности', '310');
 const OT = (h, room) => L(3, h, 'Охрана труда', room);
 const ADD = {
   '21.10': [L(4, 2, 'Охрана окр. сред.', '311')],
@@ -74,8 +79,7 @@ const ADD = {
   '18.11': [L(4, 2, 'Сетевые технологии', '104')],
   '19.11': [OT(2, '308')],
   '20.11': [HIST5],
-  '25.11': [OT(0, '211')],
-  '25.11': [L(4, 2, 'Сетевые технологии', '104')],
+  '25.11': [OT(0, '211'), L(4, 2, 'Сетевые технологии', '104')],
   '27.11': [HIST5],
   '03.12': [OT(2, '308')],
   '09.12': [OT(0, '211')],
@@ -128,6 +132,8 @@ const p2 = (n) => String(n).padStart(2, '0');
 const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const idx = (d) => Math.round((d - START) / DAY);
 const key = (d) => p2(d.getDate()) + '.' + p2(d.getMonth() + 1);
+const fromKey = (k) => { const [dd, mm] = k.split('.').map(Number); return new Date(mm >= 7 ? 2026 : 2027, mm - 1, dd); };
+const ended = (name, d) => Object.keys(LAST).some((p) => name.startsWith(p) && d > fromKey(LAST[p]));
 const iso = (d) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
 const same = (a, b) => a.getTime() === b.getTime();
 const clamp = (d) => (d < START ? START : d > END ? END : d);
@@ -146,7 +152,7 @@ function lessonsFor(d) {
   const n = idx(d), w = Math.floor(n / 7), dow = n % 7;
   if (dow === 6 || inSession(d)) return [];
   const k = key(d);
-  const list = (w % 2 ? WEEK_B : WEEK_A)[dow].map((x) => ({ ...x, st: '' }));
+  const list = (w % 2 ? WEEK_B : WEEK_A)[dow].filter((x) => !ended(x.name, d)).map((x) => ({ ...x, st: '' }));
   const del = DEL[k];
   if (del) list.forEach((x) => { if (x.name.startsWith(del)) x.st = 'del'; });
   (ADD[k] || []).forEach((x) => list.push({ ...x, st: 'add' }));
@@ -176,7 +182,7 @@ function go(d, dir) {
 
 function stepDay(step) {
   let d = addDays(date, step);
-  if (idx(d) % 7 === 6) d = addDays(d, step); // воскресенье пропускаем
+  if (idx(d) % 7 === 6) d = addDays(d, step);
   if (d < START || d > END) return;
   go(d, step);
 }
@@ -210,13 +216,21 @@ function renderDays() {
   }).join('');
 }
 
-function card(l) {
+function isNow(l) {
+  if (!date || !same(date, todayDate())) return false;
+  const t = new Date().getHours() * 60 + new Date().getMinutes();
+  const [a, b] = span(l).map(hm);
+  return t >= a && t <= b;
+}
+
+function card(l, i) {
   const [a, b] = span(l);
   const room = l.room === 'с/з' ? 'спортзал' : l.room ? 'ауд. ' + l.room : (l.st === 'add' ? 'аудитория не указана' : '');
   const meta = [room, l.h === 2 ? '' : '45 мин'].filter(Boolean).join(' · ');
   const badge = { add: '<span class="badge ok">доставлено</span>', del: '<span class="badge bad">отмена</span>', hol: '<span class="badge bad">праздник</span>' }[l.st] || '';
   const teach = TEACH[l.name];
-  return `<div class="row"><div class="time"><b>${a}</b><span>${b}</span></div>` +
+  const now = isNow(l) && (l.st === '' || l.st === 'add') ? ' now' : '';
+  return `<div class="row${now}" style="--i:${i}"><div class="time"><b>${a}</b><span>${b}</span></div>` +
     `<article class="card ${l.st}" style="--h:${hue(l.name)}"><div class="ct"><h3>${l.name}</h3>${badge}</div>` +
     (meta ? `<p class="meta">${meta}</p>` : '') +
     (teach ? `<p class="teach">${teach}</p>` : '') +
@@ -238,17 +252,26 @@ function renderList(dir) {
     const f = (m) => p2(Math.floor(m / 60)) + ':' + p2(m % 60);
     sub = `${active.length} ${plural(active.length)} · ${f(first)}–${f(last)}`;
   }
+  
   let html = `<div class="dayhead"><h2>${DOW_FULL[dow]}, ${date.getDate()} ${MONTHS[date.getMonth()]}</h2><span>${sub}</span></div>`;
 
   const hol = HOLIDAYS[k];
   if (hol) html += banner('hol', 'Праздничный день', hol.name + ', занятий нет', hol.img);
   if (inSession(date)) html += banner('ses', 'Сессия', '4–10 января, обычных занятий нет');
 
+  // Линия-разделитель ставится ПОСЛЕ баннеров (или после заголовка, если баннеров нет)
+  html += `<hr class="sep">`;
+
+  const current = active.find((l) => isNow(l));
+  if (current) {
+    html += `<div class="now-lesson"><span class="now-dot"></span>Сейчас идёт <b>${current.name}</b></div>`;
+  }
+
   if (!ls.length && !hol && !inSession(date)) {
     html += `<div class="empty"><b>${dow === 6 ? 'Воскресенье' : 'Занятий нет'}</b>${dow === 6 ? 'Занятий нет, можно отдохнуть' : 'В этот день пар нет'}</div>`;
   }
 
-  let prevEnd = null;
+  let prevEnd = null, i = 0;
   ls.forEach((l) => {
     const [a, b] = span(l);
     if (prevEnd) {
@@ -258,7 +281,7 @@ function renderList(dir) {
         }
       });
     }
-    html += card(l);
+    html += card(l, i++);
     if (!prevEnd || hm(b) > hm(prevEnd)) prevEnd = b;
   });
 

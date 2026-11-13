@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v1';
+const CACHE = 'schedule-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 
