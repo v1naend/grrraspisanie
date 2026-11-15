@@ -482,9 +482,10 @@ h1 {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(0, 0, 0, .55);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.4); 
+}
+@media (prefers-color-scheme: light) {
+  .sheet { background: rgba(0, 0, 0, 0.15); }
 }
 .sheet[hidden] { display: none; }
 
@@ -498,6 +499,8 @@ h1 {
   border-top: 1px solid var(--line-strong);
   padding: 10px 18px calc(24px + env(safe-area-inset-bottom));
   animation: sheet-up .25s cubic-bezier(.2, .7, .3, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+  touch-action: pan-y; 
 }
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } }
 

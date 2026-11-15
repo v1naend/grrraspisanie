@@ -345,9 +345,70 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+/* ---------- Свайп вниз для закрытия шторки ---------- */
+
+const sheet = $('sheet');
+const sheetBody = sheet.querySelector('.sheet-body');
+let startY = 0;
+let currentY = 0;
+let isDragging = false;
+
+function closeSheet() {
+  sheet.hidden = true;
+  sheetBody.style.transform = '';
+  sheetBody.style.transition = '';
+  sheet.style.opacity = '';
+  sheet.style.transition = '';
+}
+
+sheetBody.addEventListener('touchstart', (e) => {
+  if (sheetBody.scrollTop > 0) return;
+  
+  startY = e.touches[0].clientY;
+  isDragging = true;
+  sheetBody.style.transition = 'none'; 
+}, { passive: true });
+
+sheetBody.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  
+  currentY = e.touches[0].clientY;
+  const delta = currentY - startY;
+  
+  // Если тянем вниз (delta > 0)
+  if (delta > 0) {
+    if (e.cancelable) e.preventDefault(); 
+    sheetBody.style.transform = `translateY(${delta}px)`;
+    sheet.style.opacity = 1 - (delta / 300); 
+  }
+}, { passive: false });
+
+sheetBody.addEventListener('touchend', () => {
+  if (!isDragging) return;
+  isDragging = false;
+  
+  const delta = currentY - startY;
+  sheetBody.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1)';
+  sheet.style.transition = 'opacity 0.25s ease';
+  
+  if (delta > 100) {
+    sheetBody.style.transform = 'translateY(100%)';
+    sheet.style.opacity = '0';
+    setTimeout(closeSheet, 250); //
+  } else {
+    sheetBody.style.transform = 'translateY(0)';
+    sheet.style.opacity = '1';
+  }
+});
+
+$('close').onclick = closeSheet;
+sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
+document.addEventListener('keydown', (e) => { 
+  if (e.key === 'Escape') closeSheet(); 
+});
+
 $('info').onclick = () => { $('sheet').hidden = false; };
-$('close').onclick = () => { $('sheet').hidden = true; };
-$('sheet').addEventListener('click', (e) => { if (e.target === $('sheet')) $('sheet').hidden = true; });
+
 
 window.addEventListener('hashchange', () => {
   const d = parseHash();
