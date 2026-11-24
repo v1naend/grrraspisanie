@@ -557,6 +557,25 @@ h1 {
 
 .hint { color: var(--mut); font-size: 13px; margin: 16px 0 0; line-height: 1.5; }
 
+.deadlines {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.deadlines td {
+  padding: 9px 6px;
+  border-bottom: 1px solid var(--line);
+  color: var(--mut);
+}
+.deadlines td:first-child  { color: var(--fg); font-weight: 600; }
+.deadlines td:nth-child(2) { color: var(--fg); white-space: nowrap; font-weight: 500; }
+.deadlines tr.sep td      { font-size: 13px; font-style: italic; }
+.times tr:last-child td { border-bottom: 0; }
+
+.hint { color: var(--mut); font-size: 13px; margin: 16px 0 0; line-height: 1.5; }
+
 /* ===== Узкие экраны ===== */
 @media (max-width: 360px) {
   .row { grid-template-columns: 46px 1fr; gap: 10px; }
